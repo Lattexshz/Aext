@@ -1,0 +1,15 @@
+[package]
+name = "Aext"
+version = "0.1.0"
+edition = "2021"
+description = "Aext is a simple and easy-to-use build tool that uses JSON for configuration files"
+authors = ["Overtime Coder"]
+license = "MIT"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+toml = "0.7.0"
+serde = { version = "1.0.152", features = ["derive"] }
+
+clap = "4.1.4"
