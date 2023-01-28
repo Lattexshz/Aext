@@ -7,26 +7,38 @@ static mut EXTENSIONS: Vec<aext::Aext> = vec![];
 
 fn main() {
     // Find files
-    let ext:Vec<PathBuf> = match std::fs::read_dir(Path::new(&format!("{}/extensions",std::env::current_dir().unwrap().as_os_str().to_str().unwrap()))) {
+    let ext: Vec<PathBuf> = match std::fs::read_dir(Path::new(&format!(
+        "{}/extensions",
+        std::env::current_dir()
+            .unwrap()
+            .as_os_str()
+            .to_str()
+            .unwrap()
+    ))) {
         Ok(result) => {
-            println!("OK");
-            let mut vec:Vec<PathBuf> = vec!();
+            let mut vec: Vec<PathBuf> = vec![];
             for i in result {
                 let entry = i.unwrap();
-                println!("ext:{}",Path::new(&entry.file_name()).extension().unwrap().to_str().unwrap());
-                if Path::new(&entry.file_name()).extension().unwrap().to_str().unwrap() == "toml" {
-                    println!("{}",entry.path().as_os_str().to_str().unwrap());
+                if Path::new(&entry.file_name())
+                    .extension()
+                    .unwrap()
+                    .to_str()
+                    .unwrap()
+                    == "toml"
+                {
                     vec.push(entry.path());
                 }
             }
             vec
         }
         Err(_) => {
-            vec!()
+            vec![]
         }
     };
     // Do not assign anything to EXTENSION after this
-    unsafe { EXTENSIONS = find_aexts(ext); }
+    unsafe {
+        EXTENSIONS = find_aexts(ext);
+    }
     // EXTENSIONS are guaranteed to have a value after assignment, so unwrapping is not a problem.
 
     let matches = Command::new("aext")
@@ -44,19 +56,42 @@ fn main() {
         //         .long_flag("build")
         //         .about("Build project."),
         // )
-        .subcommand(Command::new("list")
-            .about("List plugins"))
+        .subcommand(Command::new("list").about("List plugins"))
         .get_matches();
 
     match matches.subcommand() {
         Some(("build", _sync_matches)) => {}
-        Some(("list",_sync_matches)) => unsafe {
-            println!("{} Aext scripts loaded.\n",EXTENSIONS.len());
+        Some(("list", _sync_matches)) => unsafe {
+            println!("{} Aext scripts loaded.\n", EXTENSIONS.len());
             for e in EXTENSIONS.clone() {
+                println!("--------------------------------------");
                 let plugin = e.plugin.unwrap();
-                println!("Name:{} Version:{}",plugin.name.unwrap(),plugin.version.unwrap());
+                println!(
+                    "Name:{} Version:{}",
+                    plugin.name.unwrap(),
+                    plugin.version.unwrap()
+                );
+                match plugin.authors {
+                    None => {
+
+                    }
+                    Some(a) => {
+                        print!("authors: ");
+                        for a in a {
+                            print!("{},",a);
+                        }
+                        println!("");
+                    }
+                }
+                match plugin.description {
+                    None => {}
+                    Some(d) => {
+                        println!("{}",d);
+                    }
+                }
             }
-        }
+            println!("--------------------------------------");
+        },
         _ => unreachable!(), // If all subcommands are defined above, anything else is unreachable
     }
 }
