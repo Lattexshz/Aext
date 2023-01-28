@@ -1,2 +1,3 @@
-[project]
+[plugin]
 name = "C++"
+version = "0.1.0"

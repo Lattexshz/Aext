@@ -1,5 +1,5 @@
 [package]
-name = "Aext"
+name = "aext"
 version = "0.1.0"
 edition = "2021"
 description = "Aext is a simple and easy-to-use build tool that uses JSON for configuration files"

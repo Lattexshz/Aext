@@ -6,14 +6,15 @@ use std::path::PathBuf;
 
 use serde::Deserialize;
 
-#[derive(Debug,Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct Aext {
-    pub project:Option<ProjectConfig>
+    pub plugin: Option<PluginConfig>,
 }
 
-#[derive(Debug,Deserialize)]
-pub struct ProjectConfig {
-    pub name: Option<String>
+#[derive(Clone, Debug, Deserialize)]
+pub struct PluginConfig {
+    pub name: Option<String>,
+    pub version: Option<String>
 }
 
 pub struct AextError {
@@ -29,21 +30,21 @@ impl AextError {
 
     pub fn required_field(str: impl Into<String>) -> Self {
         Self {
-            error: _AextError::RequiredField(str.into())
+            error: _AextError::RequiredField(str.into()),
         }
     }
 }
 
 enum _AextError {
     IllegalArgument(String),
-    RequiredField(String)
+    RequiredField(String),
 }
 
 impl _AextError {
     pub fn description(&self) -> &str {
         match self {
             _AextError::IllegalArgument(s) => s.as_str(),
-            _AextError::RequiredField(s) => s.as_str()
+            _AextError::RequiredField(s) => s.as_str(),
         }
     }
 }
@@ -52,7 +53,7 @@ impl fmt::Display for AextError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self.error {
             _AextError::IllegalArgument(s) => f.write_str(s),
-            _AextError::RequiredField(s) => f.write_str(s)
+            _AextError::RequiredField(s) => f.write_str(s),
         }
     }
 }
@@ -63,10 +64,10 @@ impl Debug for AextError {
     }
 }
 
-pub fn parse_aext(path:Vec<PathBuf>) -> Vec<Aext> {
-    let mut aexts:Vec<Aext> = vec!();
-    if path.len() == 0 {
-        return vec!();
+pub fn parse_aext(path: Vec<PathBuf>) -> Vec<Aext> {
+    let mut aexts: Vec<Aext> = vec![];
+    if path.is_empty() {
+        return vec![];
     }
 
     for p in path {
@@ -81,13 +82,36 @@ pub fn parse_aext(path:Vec<PathBuf>) -> Vec<Aext> {
         let mut contents = String::new();
         f.read_to_string(&mut contents)
             .expect("something went wrong reading the file");
-
-        // テキストは\n{}です
-        println!("With text:\n{}", contents);
-        let decoded:Aext = toml::from_str(&*contents).unwrap();
-        println!("{:#?}", decoded);
+        let decoded: Aext = toml::from_str(&contents).unwrap();
+        check_script(decoded.clone());
         aexts.push(decoded)
     }
 
     aexts
+}
+
+fn check_script(aext: Aext) {
+    match aext.plugin {
+        None => {
+            println!(
+                "error: [project] is not defined.
+This field is required
+note:Are you using the 'Project' as an upper case?"
+            );
+            std::process::exit(1);
+        }
+        Some(p) =>  {
+            match p.name {
+                None => {
+                    println!(
+                        "error: [project][name] is not defined.
+This field is required"
+                    );
+                }
+                Some(p) => {
+
+                }
+            }
+        },
+    };
 }
