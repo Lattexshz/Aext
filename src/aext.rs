@@ -19,6 +19,17 @@ pub struct PluginConfig {
     pub description: Option<String>,
 }
 
+#[derive(Clone,Debug,Deserialize)]
+pub struct ExecuteConfig {
+    pub step: Option<StepConfig>
+}
+
+#[derive(Clone,Debug,Deserialize)]
+pub struct StepConfig {
+    pub program: Option<String>,
+    pub command: Option<String>
+}
+
 pub struct AextError {
     error: _AextError,
 }

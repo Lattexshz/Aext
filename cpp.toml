@@ -5,3 +5,7 @@ authors = ["Overtime Coder"]
 description = "Compilation of C++ source (C source can also be compiled)"
 
 [execute]
+
+[[step]]
+program = "gcc"
+command = "gcc ${source} ${header} -o ${name}"
