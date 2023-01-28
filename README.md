@@ -4,3 +4,11 @@
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/OvertimeCoder/Aext)
 ![GitHub Repo stars](https://img.shields.io/github/stars/OvertimeCoder/Aext?style=social)  
  
+## Concept
+* ### High scalability
+* ### Fast operation
+
+## Getting started!
+* ### [Install Aext](https://github.com/OvertimeCoder/Aext/releases)
+* Examples
+  - [C++](https://github.com/OvertimeCoder/Aext/tree/main/sample/C++) 
