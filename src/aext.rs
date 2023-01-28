@@ -14,7 +14,9 @@ pub struct Aext {
 #[derive(Clone, Debug, Deserialize)]
 pub struct PluginConfig {
     pub name: Option<String>,
-    pub version: Option<String>
+    pub version: Option<String>,
+    pub authors: Option<Vec<String>>,
+    pub description: Option<String>,
 }
 
 pub struct AextError {
@@ -91,7 +93,7 @@ pub fn parse_aext(path: Vec<PathBuf>) -> Vec<Aext> {
 }
 
 fn check_script(aext: Aext) {
-    match aext.plugin {
+    let plugin = match aext.plugin {
         None => {
             println!(
                 "error: [project] is not defined.
@@ -100,18 +102,17 @@ note:Are you using the 'Project' as an upper case?"
             );
             std::process::exit(1);
         }
-        Some(p) =>  {
-            match p.name {
-                None => {
-                    println!(
-                        "error: [project][name] is not defined.
-This field is required"
-                    );
-                }
-                Some(p) => {
-
-                }
-            }
-        },
+        Some(p) => p,
     };
+
+    match plugin.name {
+        None => {
+            println!(
+                "error: [project][name] is not defined.
+This field is required"
+            );
+            std::process::exit(1)
+        }
+        Some(_) => {}
+    }
 }
