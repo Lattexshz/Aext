@@ -8,31 +8,30 @@ pub fn list() {
         println!("{} Aext scripts loaded.\n", crate::EXTENSIONS.len());
             for e in crate::EXTENSIONS.clone() {
                 println!("--------------------------------------");
-                let plugin = e.plugin.unwrap();
                 println!(
                     "Name:{} Version:{}",
-                    plugin.name.unwrap(),
-                    plugin.version.unwrap()
+                    e.name,
+                    e.version
                 );
 
                 // Authors (Optional)
-                match plugin.authors {
-                    None => {
+                match e.authors.len() == 0 {
+                    true => {
 
                     }
-                    Some(a) => {
+                    false => {
                         print!("authors: ");
-                        for a in a {
+                        for a in e.authors {
                             print!("{},",a);
                         }
                         println!("");
                     }
                 }
                 // Description (Optional)
-                match plugin.description {
-                    None => {}
-                    Some(d) => {
-                        println!("{}",d);
+                match e.description.is_empty() == true {
+                    true => {}
+                    false => {
+                        println!("{}",e.description);
                     }
                 }
             }

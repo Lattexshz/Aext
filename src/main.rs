@@ -1,11 +1,13 @@
 use clap::Command;
 use std::path::{Path, PathBuf};
+use crate::lock::ExtensionLock;
+
 mod aext;
 mod command;
 mod lock;
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-static mut EXTENSIONS: Vec<aext::Aext> = vec![];
+static mut EXTENSIONS: Vec<ExtensionLock> = vec![];
 static mut EXTENSIONS_NEW: Vec<lock::ExtensionLock> = vec![];
 static mut COMMANDS: Vec<command::CustomCommand> = vec![];
 

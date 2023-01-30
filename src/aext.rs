@@ -5,7 +5,9 @@ use std::io::Read;
 use std::path::PathBuf;
 
 use serde::Deserialize;
+use crate::lock::ExtensionLock;
 
+#[derive(Copy, Clone)]
 pub enum ExtensionType {
     Extension,
     Command
@@ -22,7 +24,7 @@ pub struct PluginConfig {
     pub version: Option<String>,
     pub authors: Option<Vec<String>>,
     pub description: Option<String>,
-    pub ext_type: Option<ExtensionType>
+    pub ext_type: Option<String>
 }
 
 #[derive(Clone,Debug,Deserialize)]
@@ -83,8 +85,8 @@ impl Debug for AextError {
     }
 }
 
-pub fn parse_aext(path: Vec<PathBuf>) -> Vec<Aext> {
-    let mut aexts: Vec<Aext> = vec![];
+pub fn parse_aext(path: Vec<PathBuf>) -> Vec<ExtensionLock> {
+    let mut aexts: Vec<ExtensionLock> = vec![];
     if path.is_empty() {
         return vec![];
     }
@@ -103,7 +105,7 @@ pub fn parse_aext(path: Vec<PathBuf>) -> Vec<Aext> {
             .expect("something went wrong reading the file");
         let decoded: Aext = toml::from_str(&contents).unwrap();
         check_script(decoded.clone());
-        aexts.push(decoded)
+        aexts.push(decoded.into())
     }
 
     aexts
@@ -131,5 +133,46 @@ This field is required"
             std::process::exit(1)
         }
         Some(_) => {}
+    }
+}
+
+
+impl Into<ExtensionLock> for Aext {
+    fn into(self) -> ExtensionLock {
+        let config = match self.plugin {
+            None => {
+                eprintln!("error: [plugin] is not defined.");
+                std::process::exit(1)
+            },
+            Some(c) => c
+        };
+        ExtensionLock {
+            name: match config.name {
+                None => std::process::exit(1),
+                Some(n) => n
+            },
+            version: match config.version {
+                None =>  {
+                    eprintln!("error: version is not defined.\nthis field is required.");
+                    std::process::exit(1);
+                }
+                Some(v) => v
+            },
+            authors: match config.authors {
+                None => {
+                    println!("warning:Authors is not defined.");
+                    vec![]
+                }
+                Some(a) => a
+            },
+            description: match config.description {
+                None => {
+                    println!("warning:Description is not defined.");
+                    String::new()
+                }
+                Some(d) => d
+            },
+            ext_type: ExtensionType::Extension,
+        }
     }
 }

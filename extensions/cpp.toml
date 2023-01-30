@@ -3,6 +3,7 @@ name = "C++"
 version = "0.1.0"
 authors = ["Overtime Coder"]
 description = "Compilation of C++ source (C source can also be compiled)"
+ext_type = "Extension"
 
 [execute]
 
