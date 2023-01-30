@@ -1,3 +1,7 @@
+pub struct CustomCommand {
+    
+}
+
 /// Lists the currently available extensions
 pub fn list() {
     unsafe {

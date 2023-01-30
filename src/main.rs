@@ -6,6 +6,7 @@ mod astring;
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 static mut EXTENSIONS: Vec<aext::Aext> = vec![];
+static mut COMMANDS: Vec<command::CustomCommand> = vec![];
 
 fn main() {
     // Find files

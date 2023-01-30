@@ -13,3 +13,4 @@ toml = "0.7.0"
 serde = { version = "1.0.152", features = ["derive"] }
 
 clap = "4.1.4"
+aho-corasick = "0.7.20

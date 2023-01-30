@@ -6,6 +6,11 @@ use std::path::PathBuf;
 
 use serde::Deserialize;
 
+pub enum ExtensionType {
+    Extension,
+    Command
+}
+
 #[derive(Clone, Debug, Deserialize)]
 pub struct Aext {
     pub plugin: Option<PluginConfig>,
@@ -17,6 +22,7 @@ pub struct PluginConfig {
     pub version: Option<String>,
     pub authors: Option<Vec<String>>,
     pub description: Option<String>,
+    pub ext_type: Option<ExtensionType>
 }
 
 #[derive(Clone,Debug,Deserialize)]
