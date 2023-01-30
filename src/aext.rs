@@ -5,7 +5,7 @@ use std::io::Read;
 use std::path::PathBuf;
 
 use serde::Deserialize;
-use crate::lock::ExtensionLock;
+use crate::lock::{CommandLock, ExtensionLock};
 
 #[derive(Copy, Clone)]
 pub enum ExtensionType {
@@ -85,12 +85,12 @@ impl Debug for AextError {
     }
 }
 
-pub fn parse_aext(path: Vec<PathBuf>) -> Vec<ExtensionLock> {
-    let mut aexts: Vec<ExtensionLock> = vec![];
+pub fn parse_aext(path: Vec<PathBuf>) -> (Vec<ExtensionLock>,Vec<CommandLock>) {
+    let mut extensions: Vec<ExtensionLock> = vec![];
+    let mut commands: Vec<CommandLock> = vec![];
     if path.is_empty() {
-        return vec![];
+        return (vec![],vec![]);
     }
-
     for p in path {
         let mut f = match File::open(p) {
             Ok(f) => f,
@@ -104,11 +104,24 @@ pub fn parse_aext(path: Vec<PathBuf>) -> Vec<ExtensionLock> {
         f.read_to_string(&mut contents)
             .expect("something went wrong reading the file");
         let decoded: Aext = toml::from_str(&contents).unwrap();
-        check_script(decoded.clone());
-        aexts.push(decoded.into())
+        let plug = match decoded.plugin.clone() {
+            None => {
+                eprintln!("error: ext-type is not specified");
+                std::process::exit(1);
+            }
+            Some(p) => p
+        };
+        match plug.ext_type.unwrap().as_str() {
+            "Extension" => extensions.push(decoded.into()),
+            "Command" => commands.push(decoded.into()),
+            e => {
+                eprintln!("error: Unknown extension type '{}'",e);
+                std::process::exit(1);
+            }
+        }
     }
 
-    aexts
+    (extensions,commands)
 }
 
 fn check_script(aext: Aext) {
@@ -173,6 +186,14 @@ impl Into<ExtensionLock> for Aext {
                 Some(d) => d
             },
             ext_type: ExtensionType::Extension,
+        }
+    }
+}
+
+impl Into<CommandLock> for Aext {
+    fn into(self) -> CommandLock {
+        CommandLock {
+
         }
     }
 }

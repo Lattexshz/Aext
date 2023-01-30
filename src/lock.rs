@@ -9,3 +9,8 @@ pub struct ExtensionLock {
     pub description: String,
     pub ext_type: ExtensionType
 }
+
+#[derive(Clone)]
+pub struct CommandLock {
+
+}

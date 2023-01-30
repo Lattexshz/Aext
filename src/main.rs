@@ -1,6 +1,6 @@
 use clap::Command;
 use std::path::{Path, PathBuf};
-use crate::lock::ExtensionLock;
+use crate::lock::{CommandLock, ExtensionLock};
 
 mod aext;
 mod command;
@@ -8,8 +8,7 @@ mod lock;
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 static mut EXTENSIONS: Vec<ExtensionLock> = vec![];
-static mut EXTENSIONS_NEW: Vec<lock::ExtensionLock> = vec![];
-static mut COMMANDS: Vec<command::CustomCommand> = vec![];
+static mut COMMANDS: Vec<CommandLock> = vec![];
 
 fn main() {
     // Find files
@@ -43,7 +42,9 @@ fn main() {
     };
     // Do not assign anything to EXTENSION after this
     unsafe {
-        EXTENSIONS = aext::parse_aext(ext);
+        let (e,c) = aext::parse_aext(ext);
+        EXTENSIONS = e;
+        COMMANDS = c;
     }
     // EXTENSIONS are guaranteed to have a value after assignment, so unwrapping is not a problem.
 
