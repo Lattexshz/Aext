@@ -184,13 +184,46 @@ impl Into<ExtensionLock> for Aext {
                 }
                 Some(d) => d,
             },
-            ext_type: ExtensionType::Extension,
         }
     }
 }
 
 impl Into<CommandLock> for Aext {
     fn into(self) -> CommandLock {
-        CommandLock {}
+        let config = match self.plugin {
+            None => {
+                eprintln!("error: [plugin] is not defined.");
+                std::process::exit(1)
+            }
+            Some(c) => c,
+        };
+
+        CommandLock {
+            name: match config.name {
+                None => std::process::exit(1),
+                Some(n) => n,
+            },
+            version: match config.version {
+                None => {
+                    eprintln!("error: version is not defined.\nthis field is required.");
+                    std::process::exit(1);
+                }
+                Some(v) => v,
+            },
+            authors: match config.authors {
+                None => {
+                    println!("warning:Authors is not defined.");
+                    vec![]
+                }
+                Some(a) => a,
+            },
+            description: match config.description {
+                None => {
+                    println!("warning:Description is not defined.");
+                    String::new()
+                }
+                Some(d) => d,
+            },
+        }
     }
 }

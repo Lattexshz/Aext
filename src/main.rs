@@ -49,10 +49,9 @@ fn main() {
     }
     // EXTENSIONS are guaranteed to have a value after assignment, so unwrapping is not a problem.
 
-    let matches = Command::new("aext")
+    let mut cmd = Command::new("aext")
         .about("Aext - Hackable build tool")
         .version(VERSION)
-        .subcommand_required(true)
         .arg_required_else_help(true)
         .author("Overtime Coder")
         // Sync subcommand
@@ -65,10 +64,15 @@ fn main() {
         //         .about("Build project."),
         // )
         .subcommand(Command::new("info").about("Show Aext's consider information"))
-        .subcommand(Command::new("list").about("List plugins"))
-        .get_matches();
+        .subcommand(Command::new("list").about("List plugins"));
 
-    match matches.subcommand() {
+    unsafe {
+        for c in COMMANDS.clone() {
+            cmd = cmd.subcommand(Command::new(c.name).about(c.description));
+        }
+    }
+
+    match cmd.get_matches().subcommand() {
         Some(("build", _sync_matches)) => {}
         Some(("info",_sync_matches)) => {
             command::info();
@@ -76,17 +80,8 @@ fn main() {
         Some(("list", _sync_matches)) => unsafe {
             command::list();
         },
-        custom => unsafe {
-            let (name,matches) = match custom {
-                None => unreachable!(),
-                Some(tuple) => {
-                    tuple
-                }
-            };
 
-            for c in COMMANDS {
-
-            }
-        }
+        _ => {}
     }
-}
+    }
+
