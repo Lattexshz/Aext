@@ -2,10 +2,11 @@ use clap::Command;
 use std::path::{Path, PathBuf};
 mod aext;
 mod command;
-mod astring;
+mod lock;
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 static mut EXTENSIONS: Vec<aext::Aext> = vec![];
+static mut EXTENSIONS_NEW: Vec<lock::ExtensionLock> = vec![];
 static mut COMMANDS: Vec<command::CustomCommand> = vec![];
 
 fn main() {
