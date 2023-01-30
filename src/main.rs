@@ -1,11 +1,12 @@
-use clap::Command;
-use std::path::{Path, PathBuf};
 use crate::lock::{CommandLock, ExtensionLock};
+use clap::{ArgMatches, ColorChoice, Command};
+use std::path::{Path, PathBuf};
 
 mod aext;
 mod command;
 mod lock;
-const VERSION: &str = env!("CARGO_PKG_VERSION");
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+pub const RUST_VERSION: &str = env!("CARGO_PKG_RUST_VERSION");
 
 static mut EXTENSIONS: Vec<ExtensionLock> = vec![];
 static mut COMMANDS: Vec<CommandLock> = vec![];
@@ -42,7 +43,7 @@ fn main() {
     };
     // Do not assign anything to EXTENSION after this
     unsafe {
-        let (e,c) = aext::parse_aext(ext);
+        let (e, c) = aext::parse_aext(ext);
         EXTENSIONS = e;
         COMMANDS = c;
     }
@@ -63,14 +64,29 @@ fn main() {
         //         .long_flag("build")
         //         .about("Build project."),
         // )
+        .subcommand(Command::new("info").about("Show Aext's consider information"))
         .subcommand(Command::new("list").about("List plugins"))
         .get_matches();
 
     match matches.subcommand() {
         Some(("build", _sync_matches)) => {}
+        Some(("info",_sync_matches)) => {
+            command::info();
+        }
         Some(("list", _sync_matches)) => unsafe {
             command::list();
         },
-        _ => unreachable!(), // If all subcommands are defined above, anything else is unreachable
+        custom => unsafe {
+            let (name,matches) = match custom {
+                None => unreachable!(),
+                Some(tuple) => {
+                    tuple
+                }
+            };
+
+            for c in COMMANDS {
+
+            }
+        }
     }
 }

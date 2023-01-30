@@ -7,10 +7,8 @@ pub struct ExtensionLock {
     pub version: String,
     pub authors: Vec<String>,
     pub description: String,
-    pub ext_type: ExtensionType
+    pub ext_type: ExtensionType,
 }
 
 #[derive(Clone)]
-pub struct CommandLock {
-
-}
+pub struct CommandLock {}

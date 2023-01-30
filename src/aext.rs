@@ -4,13 +4,13 @@ use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
 
-use serde::Deserialize;
 use crate::lock::{CommandLock, ExtensionLock};
+use serde::Deserialize;
 
 #[derive(Copy, Clone)]
 pub enum ExtensionType {
     Extension,
-    Command
+    Command,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -24,18 +24,18 @@ pub struct PluginConfig {
     pub version: Option<String>,
     pub authors: Option<Vec<String>>,
     pub description: Option<String>,
-    pub ext_type: Option<String>
+    pub ext_type: Option<String>,
 }
 
-#[derive(Clone,Debug,Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct ExecuteConfig {
-    pub step: Option<StepConfig>
+    pub step: Option<StepConfig>,
 }
 
-#[derive(Clone,Debug,Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct StepConfig {
     pub program: Option<String>,
-    pub command: Option<String>
+    pub command: Option<String>,
 }
 
 pub struct AextError {
@@ -85,11 +85,11 @@ impl Debug for AextError {
     }
 }
 
-pub fn parse_aext(path: Vec<PathBuf>) -> (Vec<ExtensionLock>,Vec<CommandLock>) {
+pub fn parse_aext(path: Vec<PathBuf>) -> (Vec<ExtensionLock>, Vec<CommandLock>) {
     let mut extensions: Vec<ExtensionLock> = vec![];
     let mut commands: Vec<CommandLock> = vec![];
     if path.is_empty() {
-        return (vec![],vec![]);
+        return (vec![], vec![]);
     }
     for p in path {
         let mut f = match File::open(p) {
@@ -109,19 +109,19 @@ pub fn parse_aext(path: Vec<PathBuf>) -> (Vec<ExtensionLock>,Vec<CommandLock>) {
                 eprintln!("error: ext-type is not specified");
                 std::process::exit(1);
             }
-            Some(p) => p
+            Some(p) => p,
         };
         match plug.ext_type.unwrap().as_str() {
             "Extension" => extensions.push(decoded.into()),
             "Command" => commands.push(decoded.into()),
             e => {
-                eprintln!("error: Unknown extension type '{}'",e);
+                eprintln!("error: Unknown extension type '{}'", e);
                 std::process::exit(1);
             }
         }
     }
 
-    (extensions,commands)
+    (extensions, commands)
 }
 
 fn check_script(aext: Aext) {
@@ -149,41 +149,40 @@ This field is required"
     }
 }
 
-
 impl Into<ExtensionLock> for Aext {
     fn into(self) -> ExtensionLock {
         let config = match self.plugin {
             None => {
                 eprintln!("error: [plugin] is not defined.");
                 std::process::exit(1)
-            },
-            Some(c) => c
+            }
+            Some(c) => c,
         };
         ExtensionLock {
             name: match config.name {
                 None => std::process::exit(1),
-                Some(n) => n
+                Some(n) => n,
             },
             version: match config.version {
-                None =>  {
+                None => {
                     eprintln!("error: version is not defined.\nthis field is required.");
                     std::process::exit(1);
                 }
-                Some(v) => v
+                Some(v) => v,
             },
             authors: match config.authors {
                 None => {
                     println!("warning:Authors is not defined.");
                     vec![]
                 }
-                Some(a) => a
+                Some(a) => a,
             },
             description: match config.description {
                 None => {
                     println!("warning:Description is not defined.");
                     String::new()
                 }
-                Some(d) => d
+                Some(d) => d,
             },
             ext_type: ExtensionType::Extension,
         }
@@ -192,8 +191,6 @@ impl Into<ExtensionLock> for Aext {
 
 impl Into<CommandLock> for Aext {
     fn into(self) -> CommandLock {
-        CommandLock {
-
-        }
+        CommandLock {}
     }
 }
