@@ -201,28 +201,21 @@ impl Into<CommandLock> for Aext {
         CommandLock {
             name: match config.name {
                 None => std::process::exit(1),
-                Some(n) => n,
+                Some(n) => n.as_str(),
             },
             version: match config.version {
                 None => {
                     eprintln!("error: version is not defined.\nthis field is required.");
                     std::process::exit(1);
                 }
-                Some(v) => v,
-            },
-            authors: match config.authors {
-                None => {
-                    println!("warning:Authors is not defined.");
-                    vec![]
-                }
-                Some(a) => a,
+                Some(v) => v.as_str(),
             },
             description: match config.description {
                 None => {
                     println!("warning:Description is not defined.");
-                    String::new()
+                    ""
                 }
-                Some(d) => d,
+                Some(d) => d.as_str(),
             },
         }
     }
