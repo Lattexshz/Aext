@@ -51,7 +51,21 @@ fn main() {
 
     let mut cmd = Command::new("aext")
         .about("Aext - Hackable build tool")
-        .version(VERSION)
+        .help_template("\
+{before-help}{name} @[{version}]
+{author-with-newline}{about-with-newline}
+{usage-heading} {usage}
+
+{all-args}{after-help}
+")
+        .long_version(
+            format!(
+            "v{}
+             commit: abcdef89726d
+             revision: 123
+             release: 2
+             binary: aext",VERSION)
+            )
         .arg_required_else_help(true)
         .author("Overtime Coder")
         // Sync subcommand

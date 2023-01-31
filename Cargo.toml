@@ -13,5 +13,5 @@ rust-version = "1.57.0"
 toml = "0.7.0"
 serde = { version = "1.0.152", features = ["derive"] }
 
-clap = {version = "4.1.4",features = ["color"] }
+clap = {version = "4.1.4",features = ["color","help"] }
 aho-corasick = "0.7.20"
