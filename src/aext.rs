@@ -113,7 +113,9 @@ pub fn parse_aext(path: Vec<PathBuf>) -> (Vec<ExtensionLock>, Vec<CommandLock>) 
         };
         match plug.ext_type.unwrap().as_str() {
             "Extension" => extensions.push(decoded.into()),
-            "Command" => commands.push(decoded.into()),
+            "Command" => {
+                commands.push(decoded.into())
+            },
             e => {
                 eprintln!("error: Unknown extension type '{}'", e);
                 std::process::exit(1);
@@ -201,21 +203,21 @@ impl Into<CommandLock> for Aext {
         CommandLock {
             name: match config.name {
                 None => std::process::exit(1),
-                Some(n) => n.as_str(),
+                Some(n) => n,
             },
             version: match config.version {
                 None => {
                     eprintln!("error: version is not defined.\nthis field is required.");
                     std::process::exit(1);
                 }
-                Some(v) => v.as_str(),
+                Some(v) => v,
             },
             description: match config.description {
                 None => {
                     println!("warning:Description is not defined.");
-                    ""
+                    "".to_string()
                 }
-                Some(d) => d.as_str(),
+                Some(d) => d,
             },
         }
     }

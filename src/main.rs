@@ -50,22 +50,17 @@ fn main() {
     // EXTENSIONS are guaranteed to have a value after assignment, so unwrapping is not a problem.
 
     let mut cmd = Command::new("aext")
+        .version(VERSION)
         .about("Aext - Hackable build tool")
-        .help_template("\
-{before-help}{name} @[{version}]
+        .help_template(
+            "\
+{before-help}{name} v[{version}]
 {author-with-newline}{about-with-newline}
 {usage-heading} {usage}
 
 {all-args}{after-help}
-")
-        .long_version(
-            format!(
-            "v{}
-             commit: abcdef89726d
-             revision: 123
-             release: 2
-             binary: aext",VERSION)
-            )
+",
+        )
         .arg_required_else_help(true)
         .author("Overtime Coder")
         // Sync subcommand
@@ -81,14 +76,16 @@ fn main() {
         .subcommand(Command::new("list").about("List plugins"));
 
     unsafe {
-        for c in COMMANDS.clone() {
-            cmd = cmd.subcommand(Command::new(c.name).about(c.description));
+        for c in COMMANDS.clone()
+        {
+            println!("Command:{}",c.name);
+            cmd = cmd.subcommand(Command::new(c.name));
         }
     }
 
     match cmd.get_matches().subcommand() {
         Some(("build", _sync_matches)) => {}
-        Some(("info",_sync_matches)) => {
+        Some(("info", _sync_matches)) => {
             command::info();
         }
         Some(("list", _sync_matches)) => unsafe {
@@ -97,5 +94,4 @@ fn main() {
 
         _ => {}
     }
-    }
-
+}

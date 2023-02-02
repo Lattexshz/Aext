@@ -10,8 +10,8 @@ pub struct ExtensionLock {
 }
 
 #[derive(Clone)]
-pub struct CommandLock<'a> {
-    pub name: &'a str,
-    pub version: &'a str,
-    pub description: &'a str,
+pub struct CommandLock {
+    pub name: String,
+    pub version: String,
+    pub description: String,
 }
