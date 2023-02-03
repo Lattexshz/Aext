@@ -1,9 +1,15 @@
-use clap::Command;
+use crate::lock::{CommandLock, ExtensionLock};
+use clap::{ArgMatches, ColorChoice, Command};
 use std::path::{Path, PathBuf};
-mod aext;
-const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-static mut EXTENSIONS: Vec<aext::Aext> = vec![];
+mod aext;
+mod command;
+mod lock;
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+pub const RUST_VERSION: &str = env!("CARGO_PKG_RUST_VERSION");
+
+static mut EXTENSIONS: Vec<ExtensionLock> = vec![];
+static mut COMMANDS: Vec<CommandLock> = vec![];
 
 fn main() {
     // Find files
@@ -37,14 +43,24 @@ fn main() {
     };
     // Do not assign anything to EXTENSION after this
     unsafe {
-        EXTENSIONS = find_aexts(ext);
+        let (e, c) = aext::parse_aext(ext);
+        EXTENSIONS = e;
+        COMMANDS = c;
     }
     // EXTENSIONS are guaranteed to have a value after assignment, so unwrapping is not a problem.
 
-    let matches = Command::new("aext")
-        .about("Aext - Hackable build tool")
+    let mut cmd = Command::new("aext")
         .version(VERSION)
-        .subcommand_required(true)
+        .about("Aext - Hackable build tool")
+        .help_template(
+            "\
+{before-help}{name} v[{version}]
+{author-with-newline}{about-with-newline}
+{usage-heading} {usage}
+
+{all-args}{after-help}
+",
+        )
         .arg_required_else_help(true)
         .author("Overtime Coder")
         // Sync subcommand
@@ -56,47 +72,26 @@ fn main() {
         //         .long_flag("build")
         //         .about("Build project."),
         // )
-        .subcommand(Command::new("list").about("List plugins"))
-        .get_matches();
+        .subcommand(Command::new("info").about("Show Aext's consider information"))
+        .subcommand(Command::new("list").about("List plugins"));
 
-    match matches.subcommand() {
-        Some(("build", _sync_matches)) => {}
-        Some(("list", _sync_matches)) => unsafe {
-            println!("{} Aext scripts loaded.\n", EXTENSIONS.len());
-            for e in EXTENSIONS.clone() {
-                println!("--------------------------------------");
-                let plugin = e.plugin.unwrap();
-                println!(
-                    "Name:{} Version:{}",
-                    plugin.name.unwrap(),
-                    plugin.version.unwrap()
-                );
-                match plugin.authors {
-                    None => {
-
-                    }
-                    Some(a) => {
-                        print!("authors: ");
-                        for a in a {
-                            print!("{},",a);
-                        }
-                        println!("");
-                    }
-                }
-                match plugin.description {
-                    None => {}
-                    Some(d) => {
-                        println!("{}",d);
-                    }
-                }
-            }
-            println!("--------------------------------------");
-        },
-        _ => unreachable!(), // If all subcommands are defined above, anything else is unreachable
+    unsafe {
+        for c in COMMANDS.clone()
+        {
+            println!("Command:{}",c.name);
+            cmd = cmd.subcommand(Command::new(c.name));
+        }
     }
-}
 
-fn find_aexts(path: Vec<PathBuf>) -> Vec<aext::Aext> {
-    let aexts: Vec<aext::Aext> = aext::parse_aext(path);
-    aexts
+    match cmd.get_matches().subcommand() {
+        Some(("build", _sync_matches)) => {}
+        Some(("info", _sync_matches)) => {
+            command::info();
+        }
+        Some(("list", _sync_matches)) => unsafe {
+            command::list();
+        },
+
+        _ => {}
+    }
 }

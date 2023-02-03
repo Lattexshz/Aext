@@ -5,6 +5,7 @@ edition = "2021"
 description = "Aext is a simple and easy-to-use build tool that uses JSON for configuration files"
 authors = ["Overtime Coder"]
 license = "MIT"
+rust-version = "1.57.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -12,4 +13,5 @@ license = "MIT"
 toml = "0.7.0"
 serde = { version = "1.0.152", features = ["derive"] }
 
-clap = "4.1.4"
+clap = {version = "3.2.22",features = ["color"] }
+aho-corasick = "0.7.20"
